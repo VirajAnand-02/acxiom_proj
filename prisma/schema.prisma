@@ -1,0 +1,82 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           Int          @id @default(autoincrement())
+  name         String
+  email        String       @unique
+  passwordHash String
+  role         Role         @default(USER)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  memberships  Membership[] @relation("VendorMemberships")
+  items        Item[]
+  transactions Transaction[] @relation("UserTransactions")
+  carts        Cart[]
+}
+
+model Membership {
+  id               Int                @id @default(autoincrement())
+  membershipNumber String             @unique
+  vendor           User?              @relation("VendorMemberships", fields: [vendorId], references: [id])
+  vendorId         Int?
+  startDate        DateTime
+  endDate          DateTime
+  status           MembershipStatus   @default(ACTIVE)
+  duration         MembershipDuration
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+}
+
+model Item {
+  id          Int      @id @default(autoincrement())
+  name        String
+  status      String   @default("AVAILABLE")
+  vendor      User     @relation(fields: [vendorId], references: [id])
+  vendorId    Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Transaction {
+  id          Int      @id @default(autoincrement())
+  amount      Float    @default(0)
+  status      String   @default("PENDING")
+  user        User?    @relation("UserTransactions", fields: [userId], references: [id])
+  userId      Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Cart {
+  id          Int      @id @default(autoincrement())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
+  total       Float    @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  USER
+  VENDOR
+}
+
+enum MembershipStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+enum MembershipDuration {
+  SIX_MONTHS
+  ONE_YEAR
+  TWO_YEARS
+}
