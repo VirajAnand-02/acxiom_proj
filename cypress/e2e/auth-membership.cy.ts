@@ -1,5 +1,7 @@
 describe("auth + role gate + membership flow", () => {
   it("logs in as admin and creates membership", () => {
+    const membershipNumber = `MEM-E2E-${Date.now()}`;
+
     cy.visit("/login");
     cy.get("#email").type("admin@example.com");
     cy.get("#password").type("AdminPass1!");
@@ -7,7 +9,7 @@ describe("auth + role gate + membership flow", () => {
 
     cy.url().should("include", "/dashboard");
     cy.visit("/admin/maintenance/add-membership");
-    cy.get("#membershipNumber").type("MEM-E2E-0001");
+    cy.get("#membershipNumber").type(membershipNumber);
     cy.get("#vendorEmail").clear().type("vendor@example.com");
     cy.get("#startDate").type("2026-02-21");
     cy.contains("button", "Add Membership").click();

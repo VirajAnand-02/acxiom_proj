@@ -27,7 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const vendor = await prisma.user.findUnique({
-    where: { email: parsed.data.vendorEmail }
+    where: { email: parsed.data.vendorEmail.toLowerCase() }
   });
   if (!vendor || vendor.role !== Role.VENDOR) {
     return res.status(400).json({ message: "Vendor not found" });

@@ -6,9 +6,12 @@ export const durationEnum = z.nativeEnum(MembershipDuration, {
 });
 
 export const addMembershipSchema = z.object({
-  membershipNumber: z.string().min(1, "Membership number is required"),
-  vendorEmail: z.string().email("Vendor email is required"),
-  startDate: z.string().min(1, "Start date is required"),
+  membershipNumber: z.string().trim().min(1, "Membership number is required"),
+  vendorEmail: z.string().trim().toLowerCase().email("Vendor email is required"),
+  startDate: z
+    .string()
+    .min(1, "Start date is required")
+    .refine((value) => !Number.isNaN(new Date(value).getTime()), "Start date must be valid"),
   duration: durationEnum
 });
 
